@@ -1,0 +1,47 @@
+# Configure the AWS provider
+provider "aws" {
+  region = "us-east-1" # Replace with your desired region
+}
+ 
+# Define variables for VPC and subnets
+variable "vpc_cidr" {
+  type        = string
+  default     = "10.0.0.0/16"
+  description = "CIDR block for the VPC"
+}
+ 
+variable "subnet_cidr_blocks" {
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+  description = "CIDR blocks for the subnets"
+}
+ 
+# Create the VPC
+resource "aws_vpc" "main" {
+  cidr_block = var.vpc_cidr
+ 
+  tags = {
+    Name = "main-vpc"
+  }
+}
+ 
+# Create the subnets
+resource "aws_subnet" "public" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.subnet_cidr_blocks[0]
+  availability_zone = "us-east-1a" # Replace with desired availability zone
+ 
+  tags = {
+    Name = "public-subnet"
+  }
+}
+ 
+resource "aws_subnet" "private" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.subnet_cidr_blocks[1]
+  availability_zone = "us-east-1b" # Replace with desired availability zone
+ 
+  tags = {
+    Name = "private-subnet"
+  }
+}
